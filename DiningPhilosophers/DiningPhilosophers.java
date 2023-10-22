@@ -1,39 +1,43 @@
 package DiningPhilosophers;
 
 import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class DiningPhilosophers {
     public enum State  {
         THINKING, HUNGRY , EATING
     }
+    private Lock lock = new ReentrantLock();
     State[] states = new State[5];
     Condition[] self = new Condition[5];
-
+    
     public DiningPhilosophers(){
         
         for (int i=0; i<5; i++ ){
             states[i] = State.THINKING;
+            self[i] = lock.newCondition();
         }
     }
 
-    public synchronized void takeForks(int i){
-        states[i] = State.HUNGRY;
-        test(i);
-        // if (states[i] != State.EATING){
-        //     try {
-        //         self[i].wait();
-        //     } catch (InterruptedException e) {
-        //         e.printStackTrace();
-        //     }
-        // }
-        while (states[i] != State.EATING){
-            try{
-                wait();
-            }catch (InterruptedException e){
-                e.printStackTrace();
+    public void takeForks(int i){
+        lock.lock();
+        try {
+            states[i] = State.HUNGRY;
+            test(i);
+            System.out.println("Your state is " + states[i]);
+            while (states[i] != State.EATING) {
+                try {
+                    self[i].await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
+        } finally {
+            lock.unlock();
         }
     }
+    
 
     public synchronized void returnForks(int i){
         states[i] = State.THINKING;
@@ -43,10 +47,17 @@ public class DiningPhilosophers {
     }
 
     private void test(int i) {
-        if ( (states[(i+4) % 5] != State.EATING) && (states[i] == State.HUNGRY)
-        && (states[(i+1) % 5] != State.EATING)){
-            states[i] = State.EATING;
-            self[i].signal();
-        }
+        lock.lock(); 
+        try {
+            if (states[(i + 1) % 5] != State.EATING && 
+                states[(i + 4) % 5] != State.EATING && 
+                states[i] == State.HUNGRY) {
+                states[i] = State.EATING;
+                self[i].signal();
+            }
+        } finally {
+            lock.unlock();
     }
+}
+
 }
