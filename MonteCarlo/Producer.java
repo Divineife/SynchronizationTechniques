@@ -28,8 +28,8 @@ public class Producer implements Runnable {
         }
         }
         double pi = 4 * ((double) pointsInsideCircle / numberOfCoordinates);
-        buffer.insert(pi, id);
-        // System.out.println("Producer " + id + " produced " + pi);
+        buffer.insert(pi);
+        System.out.println("Producer " + id + " produced " + pi);
     }
     
 }

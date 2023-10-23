@@ -9,6 +9,7 @@ public class BoundedBuffer<E> implements Buffer<E>{
     private Semaphore mutex;
     private Semaphore empty;
     private Semaphore full;
+    
 
     public BoundedBuffer(){
         in = 0;
@@ -20,7 +21,7 @@ public class BoundedBuffer<E> implements Buffer<E>{
         
     }
 
-    public void insert(E item, int id){
+    public void insert(E item){
         try {
             empty.acquire();
             mutex.acquire();
