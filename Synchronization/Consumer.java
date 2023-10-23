@@ -14,7 +14,7 @@ public class Consumer implements Runnable{
         int randomNumber;
 
         while(true){
-            SleepUtilities.nap(7000);
+            SleepUtilities.nap(1000);
             randomNumber = buffer.remove();
             System.out.println("CONSUMER CONSUMED " + randomNumber);
         }
